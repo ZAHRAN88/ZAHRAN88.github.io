@@ -56,6 +56,103 @@
     
     
 	</nav>
+	<div id="chatbot-icon" class="chatbot-icon"><i class="fas fa-comment-alt"></i></div>
+
+
+  <div id="chatbot"></div>
+
+	<!-- add the chatbot script -->
+  
+  
+  <script>
+ // Create the chatbot container
+var chatbotContainer = document.createElement("div");
+chatbotContainer.setAttribute("id", "chatbot-container");
+
+// Create the chatbot icon
+var chatbotIcon = document.createElement("img");
+chatbotIcon.setAttribute("id", "chatbot-icon");
+chatbotIcon.setAttribute("src", "chatbot-icon.png");
+
+// Add the chatbot icon to the container
+chatbotContainer.appendChild(chatbotIcon);
+
+// Add the chatbot container to the page
+document.body.appendChild(chatbotContainer);
+
+// Create the chatbot UI
+var chatbotUI = '<div class="chatbot-header"><h2>Chatbot</h2></div>' +
+                '<div class="chatbot-messages"></div>' +
+                '<div class="chatbot-input-container">' +
+                    '<input type="text" id="chatbot-input" placeholder="Type your message">' +
+                    '<button id="chatbot-send">Send</button>' +
+                '</div>';
+
+// Create a function to open the chatbox
+function openChatbox() {
+    // Create the chatbox
+    var chatbox = document.createElement("div");
+    chatbox.setAttribute("id", "chatbox");
+    chatbox.innerHTML = chatbotUI;
+
+    // Add the chatbox to the page
+    document.body.appendChild(chatbox);
+
+    // Get the chatbot input and send button
+    var chatbotInput = document.getElementById("chatbot-input");
+    var chatbotSend = document.getElementById("chatbot-send");
+
+    // Create a function to add messages to the chatbot
+    function addMessage(message, isBot) {
+        var chatbotMessages = document.querySelector('.chatbot-messages');
+        var messageClass = isBot ? 'bot-message' : 'user-message';
+        chatbotMessages.innerHTML += '<div class="' + messageClass + '">' + message + '</div>';
+    }
+
+    // Initialize GPT-3 API
+    const gpt3 = require('openai');
+    process.env.OPENAI_API_KEY = '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';
+
+
+    // Create a function to handle user input
+    async function handleInput() {
+        var message = chatbotInput.value;
+        addMessage(message, false);
+        chatbotInput.value = '';
+
+        // Call GPT-3 API to get the response
+        const prompt = `User: ${message}\nBot:`;
+        const { data: { choices } } = await gpt3.completions.create({
+          prompt,
+          max_tokens: 1024,
+          n: 1,
+          stop: ['User:']
+        });
+        const response = choices[0].text.trim();
+        
+        // Add bot's response to the chatbot
+        addMessage(response, true);
+    }
+
+    // Add an event listener to the send button
+    chatbotSend.addEventListener('click', handleInput);
+
+    // Add an event listener to the chatbot input to handle "Enter" key
+    chatbotInput.addEventListener('keyup', function(event) {
+        event.preventDefault();
+        if (event.keyCode === 13) {
+            handleInput();
+        }
+    });
+}
+
+// Add an event listener to the chatbot icon to open the chatbox
+chatbotIcon.addEventListener('click', openChatbox);
+
+
+
+
+</script>
   <div id="typing-container" style="position: relative; text-align:center; padding:10px; font-family: Arial, sans-serif; font-size: 24px; color: #f6f3f3; background-color: #ffffffe7; overflow: hidden;">
     <p id="typing-text" style="margin:0; position: relative;">رمضان كريم يا اخواتي</p>
   </div>
